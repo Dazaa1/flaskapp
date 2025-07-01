@@ -30,3 +30,24 @@ def close_db(e=None):
     # If there was a connection, close it
     if db is not None:
         db.close()
+
+    
+def init_db():
+    # new connection
+    db = get_db()
+
+    # exectute
+    with current_app.open_resource('schema.sql') as f:
+        db.execute(f.read().decode('utf8'))
+
+
+# creating a command line that runs init_db()
+@click.command()
+def init_db_command():
+    init_db()
+    click.echo('Initialized the database')
+
+# tells how to handle timestamps we convert them to datetime.datetime
+sqlite3.register_converter(
+    "timestamp", lambda v: datetime.fromisoformat(v.decode())
+)
